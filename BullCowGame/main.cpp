@@ -1,21 +1,27 @@
 #include <iostream>
 #include <string>
-
-using namespace std;
+#include "FBullCowGame.h"
 
 int main();
 
 void PrintIntro();
 void PlayGame();
-string GetGuess();
+std::string GetGuess();
 bool AskToPlayAgain();
+
+FBullCowGame BCGame;
 
 //Entry point
 int main() 
 {
-	PrintIntro();
-	PlayGame();
-	AskToPlayAgain();
+
+	do 
+	{
+		PrintIntro();
+		PlayGame();
+		//AskToPlayAgain();
+	} 
+	while (AskToPlayAgain());
 
 	return 0;
 }
@@ -24,55 +30,56 @@ int main()
 void PrintIntro() 
 {
 	constexpr int WORD_LENGTH = 5;
-	cout << "Welcome to the Bulls and Cows Game!\n";
-	cout << "Can you guess the " << WORD_LENGTH;
-	cout << " letter isogram?\n";
+	std::cout << "Welcome to the Bulls and Cows Game!\n";
+	std::cout << "Can you guess the " << WORD_LENGTH;
+	std::cout << " letter isogram?\n";
 	return;
 }
 
 //run the game core
 void PlayGame()
 {
+	BCGame.Reset();
 	
-	//constexpr to control guess limit of the game
-	constexpr int GUESS_LIMIT = 5;
-
+	int MaxTries = BCGame.GetMaxTries();
+	
 	//loop a number of turns to get guesses and print back
-	for (int counter = 1; counter <= GUESS_LIMIT; counter++)
+	for (int counter = 1; counter <= MaxTries; counter++)
 	{
-		cout << "What is your guess? ";
-		cout << "Your guess was: " << GetGuess() << endl;
-		cout << endl;
+		std::cout << "Try number " << BCGame.GetCurrentGuess() << ". What is your guess? ";
+		std::cout << "Your guess was: " << GetGuess() << std::endl;
+		std::cout << std::endl;
+		BCGame.AddTry();
 	}
 	return;
 }
 
 //get guess from user
-string GetGuess() 
+std::string GetGuess() 
 {
-	string Guess = "";
-	getline(cin, Guess);
+	std::string Guess = "";
+	std::getline(std::cin, Guess);
 	return Guess;
 }
 
 bool AskToPlayAgain()
 {
-	string Response = "";
-	cout << "Do you want to play again? (y/n) ";
-	getline(cin, Response);
+	std::string Response = "";
+	std::cout << "Do you want to play again? (y/n) ";
+	std::getline(std::cin, Response);
 	if ((Response[0] == 'Y') || (Response[0] == 'y'))
 	{
-		cout << "\n returns True";
+		//std::cout << "\n returns True";
 		return true;
 	}
 	else if ((Response[0] == 'N') || (Response[0] == 'n'))
 	{
-		cout << "\n returns False";
+		//std::cout << "\n returns False";
 		return false;
 	}
 	else 
 	{
-		cout << "Wrong input! Exitting...";
+		std::cout << "\nWrong input! Exitting...\n";
 		return false;
 	}	
 }
