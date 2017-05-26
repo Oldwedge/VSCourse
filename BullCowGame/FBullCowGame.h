@@ -12,6 +12,15 @@ struct FBullCowCount
 	int32 Cows = 0;
 };
 
+//enum to handle error feedback
+enum class EErrorCodes
+{
+	OK,
+	SHORT,
+	LONG,
+	NOT_ISOGRAM,
+	UNKNOWN
+};
 
 class FBullCowGame 
 {
@@ -25,14 +34,17 @@ public:
 
 	int32 GetCurrentGuess() const;
 	int32 GetMaxTries() const;
-	bool IsGameWon() const;
-	
-	void AddTry();
-	void Reset();
-	bool CheckGuessVlidity(FString);
+	int32 GetHiddenWordLength() const;
 
+	bool IsGameWon(FBullCowCount) const;
+	void Reset();
+	//method to return validity check and error message enum
+	EErrorCodes CheckGuessValidityEnum(FString Guess) const;
+	//EErrorCodes CheckGuessValidity(FString Guess) const;
 	//provide method to return bulls and cows
-	FBullCowCount SubmitGuess(FString);
+	FBullCowCount SubmitGuess(FString Guess);
+	//convert guess to lower case
+	FString LowerCaseGuess(FString Guess);
 
 private:
 	int32 MyCurrentTries;
