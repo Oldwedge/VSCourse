@@ -9,6 +9,7 @@ int main();
 void PrintIntro();
 void PlayGame();
 FText GetValidGuess();
+void PrintGameSummary();
 bool AskToPlayAgain();
 
 FBullCowGame BCGame;
@@ -22,6 +23,7 @@ int main()
 	{		
 		PrintIntro();
 		PlayGame();
+		PrintGameSummary();
 		PlayAgain = AskToPlayAgain();
 	} 
 	while (PlayAgain);
@@ -33,9 +35,9 @@ int main()
 void PrintIntro() 
 {
 	//for future versions, provide method to vary word length
-	std::cout << "Welcome to the Bulls and Cows Game!\n";
+	std::cout << "\n\nWelcome to the Bulls and Cows Game!\n";
 	std::cout << std::endl;
-	std::cout << "Can you guess the " << BCGame.GetHiddenWordLength() << " letter isogram I am thinking of?\n";
+	std::cout << "Can you guess the " << BCGame.GetHiddenWordLength() << " letter isogram I am thinking of?";
 	std::cout << std::endl;
 	return;
 }
@@ -59,21 +61,29 @@ void PlayGame()
 		int32 NumberOfBulls = BullCowCount.Bulls;
 		int32 NumberOfCows = BullCowCount.Cows;
 
-		std::cout << "You got " << NumberOfBulls << " bulls and " << NumberOfCows << " cows." << std::endl;
+		std::cout << "You got " << NumberOfBulls << " bulls and " << NumberOfCows << " cows! <<---\n\n";
 	}
-	while ((!BCGame.IsGameWon(BullCowCount)) && (BCGame.GetCurrentGuess() <= BCGame.GetMaxTries()));
+	while ((!BCGame.IsGameWon()) && (BCGame.GetCurrentGuess() <= BCGame.GetMaxTries()));
+	
+	return;
+}
+
+
+void PrintGameSummary()
+{
 
 	//summarize game, check if the user won and print final result
-	if (BCGame.IsGameWon(BullCowCount) == true) {
-		std::cout << "\n**************************************\n";
-		std::cout << "* Congratulations! You won the game! *\n";
-		std::cout << "**************************************\n\n";
+	if (BCGame.IsGameWon())
+	{
+		std::cout << "\n*****************************************************\n";
+		std::cout << "* Congratulations! You won the game in " << (BCGame.GetCurrentGuess() - 1) << " attempt(s) *\n";
+		std::cout << "*****************************************************\n\n";
 	}
 	else
-	{	
-		std::cout << "\n*************\n";
-		std::cout << "* GAME OVER *\n";
-		std::cout << "*************\n\n";
+	{
+		std::cout << "\n*********************\n";
+		std::cout << "***** GAME OVER *****\n";
+		std::cout << "*********************\n\n";
 	}
 	return;
 }
@@ -87,14 +97,11 @@ FText GetValidGuess()
 	//loop to get guesses and print response
 	do
 	{
-		std::cout << "Try number " << BCGame.GetCurrentGuess() << ". What is your guess? ";
+		std::cout << "\nTry # " << BCGame.GetCurrentGuess() << " / " << BCGame.GetMaxTries() << ". What is your guess? ";
 		//get guess
 		
 		std::getline(std::cin, Guess);
-		std::cout << std::endl;
-		//send for convertion
-		Guess = BCGame.LowerCaseGuess(Guess);
-
+		
 		// validate guess enum
 		GuessStatus = BCGame.CheckGuessValidityEnum(Guess);
 
@@ -102,35 +109,39 @@ FText GetValidGuess()
 		switch (GuessStatus)
 		{
 		case EErrorCodes::SHORT:
-			ErrorMessage = "The word is too short.";
+			ErrorMessage = "The guess is too short.\n\n";
 			break;
 		case EErrorCodes::LONG:
-			ErrorMessage = "The word is too long.";
+			ErrorMessage = "The guess is too long.\n\n";
 			break;
 		case EErrorCodes::NOT_ISOGRAM:
-			ErrorMessage = "The word is not an isogram.";
+			ErrorMessage = "The guess is not an isogram.\n\n";
+			break;
+		case EErrorCodes::NOT_LOWER:
+			ErrorMessage = "The guess is not in lower case.\n\n";
 			break;
 		case EErrorCodes::OK:
-			ErrorMessage = "";
+			ErrorMessage = "--->> ";
 			break;
 		case EErrorCodes::UNKNOWN:
-			ErrorMessage = "Unknown Error!";
+			ErrorMessage = "Unknown Error!\n\n";
 			break;
 		default:
 			break;
 		}
 
-		std::cout << ErrorMessage << std::endl;
+		std::cout << ErrorMessage;
 	
 	} while (GuessStatus != EErrorCodes::OK);
 
 	return Guess;
 }
 
+
 bool AskToPlayAgain()
 {
 	FText Response = "";
-	std::cout << "Do you want to play again? (y/n) ";
+	std::cout << "\nDo you want to play again? (y/n) ";
 	std::getline(std::cin, Response);
 	if ((Response[0] == 'Y') || (Response[0] == 'y'))
 	{

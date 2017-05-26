@@ -19,6 +19,7 @@ enum class EErrorCodes
 	SHORT,
 	LONG,
 	NOT_ISOGRAM,
+	NOT_LOWER,
 	UNKNOWN
 };
 
@@ -36,18 +37,18 @@ public:
 	int32 GetMaxTries() const;
 	int32 GetHiddenWordLength() const;
 
-	bool IsGameWon(FBullCowCount) const;
+	bool IsGameWon() const;
 	void Reset();
 	//method to return validity check and error message enum
 	EErrorCodes CheckGuessValidityEnum(FString Guess) const;
 	//EErrorCodes CheckGuessValidity(FString Guess) const;
 	//provide method to return bulls and cows
 	FBullCowCount SubmitGuess(FString Guess);
-	//convert guess to lower case
-	FString LowerCaseGuess(FString Guess);
 
 private:
 	int32 MyCurrentTries;
-	int32 MyMaxTries;
 	FString MyHiddenWord;
+	bool bIsGameWon;
+	bool IsIsogram(FString) const;
+	bool IsLowercase(FString) const;
 };

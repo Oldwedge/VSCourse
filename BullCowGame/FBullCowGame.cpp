@@ -1,111 +1,58 @@
 #include "FBullCowGame.h"
-#include <algorithm>
-#include <iostream>
 #include <string>
+#include <map>
+#define TMap std::map
 
 using FString = std::string;
 using int32 = int;
 
-int32 FBullCowGame::GetMaxTries() const { return MyMaxTries; }
+
 int32 FBullCowGame::GetHiddenWordLength() const { return MyHiddenWord.length(); }
 int32 FBullCowGame::GetCurrentGuess() const { return MyCurrentTries; }
+bool FBullCowGame::IsGameWon() const { return bIsGameWon; }
+
+int32 FBullCowGame::GetMaxTries() const 
+{ 	
+	TMap<int32, int32> WordLengthToTries{ {3,3},{4,5},{5,6},{6,8} };
+	return WordLengthToTries[MyHiddenWord.length()]; 
+}
 
 void FBullCowGame::Reset()
 {
-	constexpr int32 MAXIMUM_TRIES = 8;
-	MyMaxTries = MAXIMUM_TRIES;
 
-	const FString HIDDEN_WORD = "bogus";
+	const FString HIDDEN_WORD = "bot";
 	MyHiddenWord = HIDDEN_WORD;
 
 	MyCurrentTries = 1;
+
+	bIsGameWon = false;
 	return;
 }
 
-bool FBullCowGame::IsGameWon(FBullCowCount BullCowCount) const
-{
 
-	if (BullCowCount.Bulls == MyHiddenWord.length()) 
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
 
 //testing enum
 EErrorCodes FBullCowGame::CheckGuessValidityEnum(FString Guess) const
 {
-	bool LengthIsCorrect = false;
-	bool IsIsogram = false;
-	
 	if (Guess.length() < MyHiddenWord.length())
 	{
-		//tell user guess is too short
 		return EErrorCodes::SHORT;
-		LengthIsCorrect = false;
-
 	}
 	else if (Guess.length() > MyHiddenWord.length())
 	{
-		//tell user guess is too long
-		return EErrorCodes::LONG;
-		LengthIsCorrect = false;
+		return EErrorCodes::LONG;	
 	}
-	else if (Guess.length() == MyHiddenWord.length())
+	else if (!IsIsogram(Guess))
 	{
-		//correct
-		LengthIsCorrect = true;
+		return EErrorCodes::NOT_ISOGRAM;
+	}
+	else if (!IsLowercase(Guess))
+	{
+		return EErrorCodes::NOT_LOWER;
 	}
 	else
 	{
-		//should not happen, let's return false and maybe return a error message
-		return EErrorCodes::UNKNOWN;
-		LengthIsCorrect = false;
-	}
-
-
-	//loop to check that guess is an isogram
-	if (LengthIsCorrect)
-	{
-
-		FString GuessChar = "";
-		FString GuessCompare = "";
-
-		for (int32 i = 0; i < Guess.length(); i++)
-		{
-
-			GuessChar = Guess[i];
-
-			for (int32 j = 0; j < Guess.length(); j++)
-			{
-
-				GuessCompare = Guess[j];
-
-				if (i != j && GuessChar == GuessCompare)
-				{
-
-					IsIsogram = false;
-
-					//ugly workaround to break outer loop as well
-					i = Guess.length() + 1;
-					return EErrorCodes::NOT_ISOGRAM;
-					break;
-
-				}
-				else
-				{
-
-					IsIsogram = true;
-
-				}
-
-			}
-
-		}
-
+		return EErrorCodes::OK;	
 	}
 	
 	return EErrorCodes();
@@ -146,17 +93,53 @@ FBullCowCount FBullCowGame::SubmitGuess(FString Guess)
 				//do nothing
 			}	
 		}
+
+		
 	}
+
+	if (BullCowCount.Bulls == MyHiddenWord.length())
+	{
+		bIsGameWon = true;
+		
+	}
+	else
+	{
+		bIsGameWon = false;
+	}
+
+
 	return BullCowCount;
 }
 
-FString FBullCowGame::LowerCaseGuess(FString Guess)
+bool FBullCowGame::IsIsogram(FString Word) const
 {
+	if (Word.length() <= 1) { return true; }
 
-	FString LowGuess = Guess;
+	TMap<char, bool> LetterSeen;
 
-	transform(LowGuess.begin(), LowGuess.end(), LowGuess.begin(), ::tolower);
+	for (auto Letter : Word) {
 
-	return LowGuess;
+		Letter = tolower(Letter);
+
+		if (LetterSeen[Letter]) 
+		{ 
+			return false; 
+		}
+		else 
+		{ 
+			LetterSeen[Letter] = true; 
+		}
+	}
 	
+	return true;
+}
+
+bool FBullCowGame::IsLowercase(FString Word) const
+{
+	//loop over each char
+	for (auto Letter : Word) 
+	{
+		if (!islower(Letter)) { return false; }
+	}
+	return true;
 }
